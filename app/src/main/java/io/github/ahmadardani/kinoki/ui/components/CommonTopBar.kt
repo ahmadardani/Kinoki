@@ -1,5 +1,6 @@
 package io.github.ahmadardani.kinoki.ui.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -17,14 +18,16 @@ import io.github.ahmadardani.kinoki.ui.theme.KinokiWhite
 @Composable
 fun CommonTopBar(
     title: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
                 color = KinokiWhite,
-                fontWeight = FontWeight.SemiBold            )
+                fontWeight = FontWeight.SemiBold
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -35,6 +38,7 @@ fun CommonTopBar(
                 )
             }
         },
+        actions = actions,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = KinokiDarkBlue
         )
