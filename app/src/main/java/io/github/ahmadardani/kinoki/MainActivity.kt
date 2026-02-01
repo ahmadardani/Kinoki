@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.github.ahmadardani.kinoki.ui.screens.CreateDeckScreen
 import io.github.ahmadardani.kinoki.ui.screens.HomeScreen
 import io.github.ahmadardani.kinoki.ui.screens.SettingsScreen
 import io.github.ahmadardani.kinoki.ui.theme.KinokiTheme
@@ -23,10 +24,17 @@ class MainActivity : ComponentActivity() {
                 when (currentScreen) {
                     "home" -> HomeScreen(
                         onNavigateToSettings = { currentScreen = "settings" },
-                        onAddDeckClick = { }
+                        onAddDeckClick = { currentScreen = "create_deck" }
                     )
                     "settings" -> SettingsScreen(
                         onNavigateToHome = { currentScreen = "home" }
+                    )
+                    "create_deck" -> CreateDeckScreen(
+                        onNavigateBack = { currentScreen = "home" },
+                        onCreateDeck = { newDeckName ->
+                            println("Deck Created: $newDeckName")
+                            currentScreen = "home"
+                        }
                     )
                 }
             }
