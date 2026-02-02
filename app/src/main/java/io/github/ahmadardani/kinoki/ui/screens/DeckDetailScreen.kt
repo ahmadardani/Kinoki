@@ -133,7 +133,7 @@ fun DeckDetailScreen(
                     text = "Quiz requires at least 4 cards.",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Red.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
         }

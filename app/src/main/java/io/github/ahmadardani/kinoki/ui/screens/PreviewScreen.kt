@@ -46,39 +46,27 @@ fun PreviewScreen(
         if (cards.isNotEmpty()) {
             val card = cards[index]
 
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(KinokiBackground)
-                    .padding(innerPadding),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(innerPadding)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                IconButton(
-                    onClick = { viewModel.prevCard() },
-                    enabled = index > 0,
-                    modifier = Modifier.size(64.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Previous",
-                        tint = if (index > 0) KinokiDarkBlue else Color.LightGray.copy(alpha = 0.5f),
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-
                 Card(
                     colors = CardDefaults.cardColors(containerColor = KinokiWhite),
                     shape = RectangleShape,
                     elevation = CardDefaults.cardElevation(4.dp),
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(0.7f)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.9f)
                         .clickable { viewModel.onCardTap() }
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(24.dp),
+                            .padding(horizontal = 60.dp, vertical = 24.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -117,14 +105,33 @@ fun PreviewScreen(
                 }
 
                 IconButton(
+                    onClick = { viewModel.prevCard() },
+                    enabled = index > 0,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 4.dp)
+                        .size(64.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Previous",
+                        tint = if (index > 0) KinokiDarkBlue else Color.LightGray.copy(alpha = 0.3f),
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+
+                IconButton(
                     onClick = { viewModel.nextCard() },
                     enabled = index < cards.size - 1,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 4.dp)
+                        .size(64.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Next",
-                        tint = if (index < cards.size - 1) KinokiDarkBlue else Color.LightGray.copy(alpha = 0.5f),
+                        tint = if (index < cards.size - 1) KinokiDarkBlue else Color.LightGray.copy(alpha = 0.3f),
                         modifier = Modifier.size(48.dp)
                     )
                 }
