@@ -40,6 +40,16 @@ class DeckRepository(private val context: Context) {
         file.writeText(jsonString)
     }
 
+    fun importDeckFromJson(jsonString: String) {
+        try {
+            val deck = json.decodeFromString<Deck>(jsonString)
+
+            saveDeck(deck)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     fun deleteDeck(deckId: String) {
         val filename = "$deckId.json"
         val file = File(context.filesDir, filename)

@@ -24,6 +24,13 @@ class HomeViewModel(private val repository: DeckRepository) : ViewModel() {
         }
     }
 
+    fun importDeck(jsonString: String) {
+        viewModelScope.launch {
+            repository.importDeckFromJson(jsonString)
+            loadDecks()
+        }
+    }
+
     fun createDeck(title: String) {
         viewModelScope.launch {
             repository.createNewDeck(title)

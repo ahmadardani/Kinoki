@@ -1,5 +1,7 @@
 package io.github.ahmadardani.kinoki.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,8 +42,25 @@ fun HomeScreen(
     onDeckClick: (String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val decks by viewModel.decks.collectAsStateWithLifecycle()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            try {
+                val content = context.contentResolver.openInputStream(it)?.bufferedReader().use { reader ->
+                    reader?.readText()
+                }
+
+                content?.let { json -> viewModel.importDeck(json) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadDecks()
@@ -64,7 +84,10 @@ fun HomeScreen(
                     ExtendedFloatingActionButton(
                         text = { Text("Import Deck") },
                         icon = { Icon(Icons.Default.FileUpload, contentDescription = null) },
-                        onClick = { isExpanded = false },
+                        onClick = {
+                            isExpanded = false
+                            launcher.launch("application/json")
+                        },
                         containerColor = KinokiWhite,
                         contentColor = KinokiDarkBlue
                     )
