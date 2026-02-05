@@ -15,8 +15,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,11 +39,11 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToSettings: () -> Unit,
     onAddDeckClick: () -> Unit,
-    onDeckClick: (String) -> Unit
+    onDeckClick: (String) -> Unit,
+    onEditDeck: (String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
     val decks by viewModel.decks.collectAsStateWithLifecycle()
 
     val launcher = rememberLauncherForActivityResult(
@@ -54,7 +54,6 @@ fun HomeScreen(
                 val content = context.contentResolver.openInputStream(it)?.bufferedReader().use { reader ->
                     reader?.readText()
                 }
-
                 content?.let { json -> viewModel.importDeck(json) }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -135,6 +134,7 @@ fun HomeScreen(
                         DeckItem(
                             deck = deck,
                             onClick = { onDeckClick(deck.id) },
+                            onEdit = { onEditDeck(deck.id) },
                             onDelete = { viewModel.deleteDeck(deck.id) }
                         )
                     }
@@ -170,8 +170,11 @@ fun EmptyState() {
 fun DeckItem(
     deck: Deck,
     onClick: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = KinokiWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -181,23 +184,12 @@ fun DeckItem(
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(KinokiBackground, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Folder,
-                    contentDescription = null,
-                    tint = KinokiDarkBlue
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -208,6 +200,9 @@ fun DeckItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = "${deck.cards.size} Cards",
                     style = MaterialTheme.typography.bodySmall,
@@ -215,12 +210,52 @@ fun DeckItem(
                 )
             }
 
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.Red.copy(alpha = 0.5f)
-                )
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Options",
+                        tint = Color.Gray
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    containerColor = KinokiWhite,
+                    shape = RoundedCornerShape(16.dp),
+                    tonalElevation = 4.dp
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Edit Deck", color = KinokiDarkBlue) },
+                        onClick = {
+                            showMenu = false
+                            onEdit()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Create,
+                                contentDescription = null,
+                                tint = KinokiDarkBlue
+                            )
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Delete Deck", color = Color.Red) },
+                        onClick = {
+                            showMenu = false
+                            onDelete()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = Color.Red
+                            )
+                        }
+                    )
+                }
             }
         }
     }

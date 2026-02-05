@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
                             viewModel = homeViewModel,
                             onNavigateToSettings = { navController.navigate("settings") },
                             onAddDeckClick = { navController.navigate("create_deck") },
-                            onDeckClick = { deckId -> navController.navigate("deck_detail/$deckId") }
+                            onDeckClick = { deckId -> navController.navigate("deck_detail/$deckId") },
+                            onEditDeck = { deckId ->
+                                navController.navigate("edit_deck/$deckId")
+                            }
                         )
                     }
 
@@ -43,6 +46,16 @@ class MainActivity : ComponentActivity() {
                         CreateDeckScreen(
                             onNavigateBack = { navController.popBackStack() },
                             onCreateDeck = { title -> homeViewModel.createDeck(title); navController.popBackStack() }
+                        )
+                    }
+
+                    composable("edit_deck/{deckId}") { backStackEntry ->
+                        val deckId = backStackEntry.arguments?.getString("deckId") ?: return@composable
+
+                        EditDeckScreen(
+                            deckId = deckId,
+                            viewModel = homeViewModel,
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
 

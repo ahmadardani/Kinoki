@@ -2,6 +2,7 @@ package io.github.ahmadardani.kinoki.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.ahmadardani.kinoki.data.model.Card
 import io.github.ahmadardani.kinoki.data.model.Deck
 import io.github.ahmadardani.kinoki.data.repository.DeckRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,9 +39,30 @@ class HomeViewModel(private val repository: DeckRepository) : ViewModel() {
         }
     }
 
+    fun updateDeckTitle(deckId: String, newTitle: String) {
+        viewModelScope.launch {
+            repository.updateDeckTitle(deckId, newTitle)
+            loadDecks()
+        }
+    }
+
     fun deleteDeck(deckId: String) {
         viewModelScope.launch {
             repository.deleteDeck(deckId)
+            loadDecks()
+        }
+    }
+
+    fun editCard(deckId: String, card: Card) {
+        viewModelScope.launch {
+            repository.editCardInDeck(deckId, card)
+            loadDecks()
+        }
+    }
+
+    fun removeCard(deckId: String, cardId: String) {
+        viewModelScope.launch {
+            repository.deleteCardFromDeck(deckId, cardId)
             loadDecks()
         }
     }
