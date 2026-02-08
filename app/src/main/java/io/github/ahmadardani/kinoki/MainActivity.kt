@@ -104,7 +104,8 @@ class MainActivity : ComponentActivity() {
                             onNavigateToAddCard = { navController.navigate("add_card/$deckId") },
                             onNavigateToPreview = { navController.navigate("preview/$deckId") },
                             onNavigateToFlashcard = { navController.navigate("flashcard/$deckId") },
-                            onNavigateToQuiz = { navController.navigate("quiz/$deckId") }
+                            onNavigateToQuiz = { navController.navigate("quiz/$deckId") },
+                            onNavigateToDrill = { navController.navigate("drill/$deckId") }
                         )
                     }
 
@@ -125,6 +126,13 @@ class MainActivity : ComponentActivity() {
                         val studyViewModel: StudyViewModel = viewModel(factory = viewModelFactory)
                         QuizScreen(deckId, studyViewModel) { navController.popBackStack() }
                     }
+
+                    composable("drill/{deckId}") { backStackEntry ->
+                        val deckId = backStackEntry.arguments?.getString("deckId") ?: return@composable
+                        val studyViewModel: StudyViewModel = viewModel(factory = viewModelFactory)
+                        DrillScreen(deckId, studyViewModel) { navController.popBackStack() }
+                    }
+
                 }
             }
         }

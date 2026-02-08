@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Style
@@ -33,7 +34,8 @@ fun DeckDetailScreen(
     onNavigateToAddCard: () -> Unit,
     onNavigateToPreview: () -> Unit,
     onNavigateToFlashcard: () -> Unit,
-    onNavigateToQuiz: () -> Unit
+    onNavigateToQuiz: () -> Unit,
+    onNavigateToDrill: () -> Unit
 ) {
 
     LaunchedEffect(deckId) {
@@ -130,6 +132,16 @@ fun DeckDetailScreen(
                 icon = Icons.Default.School,
                 enabled = displayCount >= 4,
                 onClick = onNavigateToQuiz
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            MenuButton(
+                title = "Drill",
+                subtitle = "Type the reading/answer",
+                icon = Icons.Default.Keyboard,
+                enabled = hasCards,
+                onClick = onNavigateToDrill
             )
 
             if (displayCount in 1..3) {
