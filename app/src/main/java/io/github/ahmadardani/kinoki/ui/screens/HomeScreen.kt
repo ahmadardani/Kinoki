@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +34,10 @@ import io.github.ahmadardani.kinoki.ui.components.MainBottomBar
 import io.github.ahmadardani.kinoki.ui.components.MainTopBar
 import io.github.ahmadardani.kinoki.ui.theme.*
 import io.github.ahmadardani.kinoki.ui.viewmodel.HomeViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun HomeScreen(
@@ -46,7 +51,12 @@ fun HomeScreen(
     val context = LocalContext.current
     val decks by viewModel.decks.collectAsStateWithLifecycle()
 
-    val launcher = rememberLauncherForActivityResult(
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    var deckToExport by remember { mutableStateOf<Deck?>(null) }
+
+    val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
@@ -61,12 +71,36 @@ fun HomeScreen(
         }
     }
 
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { saveUri ->
+            deckToExport?.let { deck ->
+                scope.launch(Dispatchers.IO) {
+                    try {
+                        val jsonString = Json { prettyPrint = true }.encodeToString(deck)
+
+                        context.contentResolver.openOutputStream(saveUri)?.use { outputStream ->
+                            outputStream.write(jsonString.toByteArray())
+                        }
+
+                        snackbarHostState.showSnackbar("Deck exported successfully.")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        snackbarHostState.showSnackbar("Failed to export deck.")
+                    }
+                }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.loadDecks()
     }
 
     Scaffold(
         topBar = { MainTopBar(title = "Home") },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             MainBottomBar(
                 currentScreen = "home",
@@ -85,7 +119,7 @@ fun HomeScreen(
                         icon = { Icon(Icons.Default.FileUpload, contentDescription = null) },
                         onClick = {
                             isExpanded = false
-                            launcher.launch("application/json")
+                            importLauncher.launch("application/json")
                         },
                         containerColor = KinokiWhite,
                         contentColor = KinokiDarkBlue
@@ -135,7 +169,11 @@ fun HomeScreen(
                             deck = deck,
                             onClick = { onDeckClick(deck.id) },
                             onEdit = { onEditDeck(deck.id) },
-                            onDelete = { viewModel.deleteDeck(deck.id) }
+                            onDelete = { viewModel.deleteDeck(deck.id) },
+                            onExport = {
+                                deckToExport = deck
+                                exportLauncher.launch("${deck.title}.json")
+                            }
                         )
                     }
                 }
@@ -171,7 +209,8 @@ fun DeckItem(
     deck: Deck,
     onClick: () -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onExport: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -235,6 +274,21 @@ fun DeckItem(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Create,
+                                contentDescription = null,
+                                tint = KinokiDarkBlue
+                            )
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Export Deck", color = KinokiDarkBlue) },
+                        onClick = {
+                            showMenu = false
+                            onExport()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Share,
                                 contentDescription = null,
                                 tint = KinokiDarkBlue
                             )
