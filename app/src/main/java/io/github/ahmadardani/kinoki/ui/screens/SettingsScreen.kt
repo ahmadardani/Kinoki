@@ -3,10 +3,10 @@ package io.github.ahmadardani.kinoki.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,11 +47,7 @@ fun SettingsScreen(
                 title = "Appearance",
                 onClick = {}
             )
-            SettingsItem(
-                icon = Icons.Default.Share,
-                title = "Export",
-                onClick = {}
-            )
+
             SettingsItem(
                 icon = Icons.Default.Info,
                 title = "About",
@@ -74,24 +70,31 @@ fun SettingsItem(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
+
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .height(80.dp)
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = KinokiDarkBlue
+                tint = KinokiDarkBlue,
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = title,
                 color = KinokiDarkBlue,
-                fontWeight = FontWeight.Medium
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
     }
