@@ -170,7 +170,7 @@ fun QuizScreen(
 
                         if (!card.center.isNullOrBlank()) {
                             IconButton(
-                                onClick = { showHint = true },
+                                onClick = { showHint = !showHint },
                                 modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
                             ) {
                                 Icon(
