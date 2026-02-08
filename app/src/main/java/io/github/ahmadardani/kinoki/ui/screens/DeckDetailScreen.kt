@@ -26,6 +26,8 @@ import io.github.ahmadardani.kinoki.ui.viewmodel.DeckDetailViewModel
 @Composable
 fun DeckDetailScreen(
     deckId: String,
+    initialCount: Int,
+    initialTitle: String,
     viewModel: DeckDetailViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToAddCard: () -> Unit,
@@ -40,10 +42,13 @@ fun DeckDetailScreen(
 
     val deck by viewModel.deck.collectAsStateWithLifecycle()
 
+    val displayCount = deck?.cards?.size ?: initialCount
+    val displayTitle = deck?.title ?: initialTitle
+
     Scaffold(
         topBar = {
             CommonTopBar(
-                title = deck?.title ?: "Loading...",
+                title = displayTitle,
                 onBackClick = onNavigateBack
             )
         },
@@ -75,7 +80,7 @@ fun DeckDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "${deck?.cards?.size ?: 0}",
+                        text = "$displayCount",
                         style = MaterialTheme.typography.displayMedium,
                         color = KinokiDarkBlue,
                         fontWeight = FontWeight.Bold
@@ -97,8 +102,7 @@ fun DeckDetailScreen(
                 textAlign = TextAlign.Start
             )
 
-            val cardCount = deck?.cards?.size ?: 0
-            val hasCards = cardCount > 0
+            val hasCards = displayCount > 0
 
             MenuButton(
                 title = "Preview",
@@ -124,11 +128,11 @@ fun DeckDetailScreen(
                 title = "Quiz",
                 subtitle = "Multiple choice test",
                 icon = Icons.Default.School,
-                enabled = cardCount >= 4,
+                enabled = displayCount >= 4,
                 onClick = onNavigateToQuiz
             )
 
-            if (cardCount in 1..3) {
+            if (displayCount in 1..3) {
                 Text(
                     text = "Quiz requires at least 4 cards.",
                     style = MaterialTheme.typography.bodySmall,

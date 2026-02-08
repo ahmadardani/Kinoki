@@ -44,7 +44,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToSettings: () -> Unit,
     onAddDeckClick: () -> Unit,
-    onDeckClick: (String) -> Unit,
+    onDeckClick: (String, Int, String) -> Unit,
     onEditDeck: (String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -167,7 +167,7 @@ fun HomeScreen(
                     items(decks) { deck ->
                         DeckItem(
                             deck = deck,
-                            onClick = { onDeckClick(deck.id) },
+                            onClick = { onDeckClick(deck.id, deck.cards.size, deck.title) },
                             onEdit = { onEditDeck(deck.id) },
                             onDelete = { viewModel.deleteDeck(deck.id) },
                             onExport = {
